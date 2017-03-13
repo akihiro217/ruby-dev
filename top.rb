@@ -11,7 +11,7 @@ client = Mysql.connect($db_host, $db_user, $db_password, $db_name)
  # GET/POST
 cgi = CGI.new
 
-limit = 10
+limit = 20
 offset  = 0
 page = 1
 if cgi["page"] != "" then
@@ -105,7 +105,7 @@ description_max_length = 100
 ##################################################
 # LIMIT, OFFSET によるページあたりのアプリ情報を取得
 ##################################################
-sql = "SELECT id, package_name, app_name, description, click_count FROM google_play ORDER BY click_count DESC, id LIMIT #{limit} OFFSET #{offset}"
+sql = "SELECT a.id, a.package_name, b.app_name, b.description, b.click_count FROM aso_db.android_masters a left join google_play b on a.package_name = b.package_name WHERE a.deactivate_date is null and b.app_name not regexp '[a-z]' ORDER BY click_count DESC, a.id LIMIT #{limit} OFFSET #{offset}"
 
 rank = 1 + offset # ランキング
 client.query(sql).each{
@@ -133,7 +133,7 @@ client.query(sql).each{
       
       print "<span class=\"rank\">#{rank}位<br><a href=\"detail.rb?id=#{package_name}\">#{app_name}</a></span><br>"
       print "(#{package_name})<br>"
-      print "クリック数：#{click_count}<br>"
+      #print "クリック数：#{click_count}<br>"
       print "<span class=\"description\">#{description_}</span> "
       print "<a href=\"detail.rb?id=#{package_name}\">もっとみる</a>"
   print "</div>"
